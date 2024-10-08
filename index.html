@@ -17,14 +17,14 @@
       <h3 id="fullDate"></h3>
       <table id="eventsTable">
         <tr>
-          <th>التاريخ</th>
-          <th>الفعالية</th>
+          <th>اسم الفعالية</th>
+          <th>تاريخ الفعالية</th>
         </tr>
       </table>
     </main>
 
     <footer>
-      <p>©Created by Helmi Tbaileh for Ana Jawwal, An-Najah University</p>
+      <p>© Created by Helmi Tbaileh for Ana Jawwal, An-Najah University</p>
     </footer>
 
     <script type="module">
@@ -102,10 +102,32 @@
         const eventsSnapshot = await getDocs(eventsCollection);
 
         eventsTable.innerHTML = ""; // تنظيف الجدول قبل التحميل
+        // إضافة العناوين في الجدول
+        eventsTable.innerHTML = `
+          <tr>
+            <th>اسم الفعالية</th>
+            <th>تاريخ الفعالية</th>
+          </tr>`;
 
         eventsSnapshot.forEach((doc) => {
           const eventData = doc.data();
-          const row = `<tr><td>${eventData.fullDate}</td><td>${eventData.event}</td></tr>`;
+          const fullDate = eventData.fullDate; // تأكد من أن هذا التاريخ بتنسيق صحيح (YYYY-MM-DD)
+
+          // تحويل التاريخ إلى كائن Date
+          const eventDate = new Date(fullDate);
+
+          // التحقق من صحة التاريخ
+          if (isNaN(eventDate)) {
+            console.error("Invalid Date:", fullDate);
+            return; // تجاهل الفعالية إذا كان التاريخ غير صالح
+          }
+
+          // إعدادات التاريخ لتشمل اسم اليوم والرقم فقط
+          const options = { weekday: "long", day: "numeric" }; // خيارات التنسيق
+          const formattedDate = eventDate.toLocaleDateString("ar-EG", options); // تنسيق التاريخ باللغة العربية
+
+          // إضافة صف للجدول مع اسم الفعالية وتاريخها
+          const row = `<tr><td>${eventData.event}</td><td>${formattedDate}</td></tr>`;
           eventsTable.innerHTML += row;
         });
       }
