@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>إدارة الفعاليات</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="header-container">
+        <img src="logo.png" alt="Logo" id="logo" />
+        <h1>إدارة الفعاليات</h1>
+      </div>
+      <h2><span id="monthYear"></span></h2>
+    </header>
+
+    <main>
+      <div class="calendar-container">
+        <h3 id="fullDate"></h3>
+        <table id="calendar">
+          <tr>
+            <th>اليوم</th>
+            <th>الفعالية</th>
+          </tr>
+        </table>
+      </div>
+      <button class="btn-primary" id="saveBtn">حفظ التغييرات</button>
+    </main>
+
+    <footer>
+      <p>©Created by Helmi Tbaileh for Ana Jawwal, An-Najah University</p>
+    </footer>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        doc,
+        setDoc,
+        deleteDoc,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAm66oTWh7K9bGz_9lD-uk5y0pwG4qG6-o",
+        authDomain: "ana-jawwal-nnu.firebaseapp.com",
+        projectId: "ana-jawwal-nnu",
+        storageBucket: "ana-jawwal-nnu",
+        messagingSenderId: "752640590456",
+        appId: "1:752640590456:web:22e1077b69e2c5ad7fe38d",
+        measurementId: "G-YSH47Z7J6E",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      const currentDate = new Date();
+      const currentHour = currentDate.getHours();
+
+      const themeIcon = document.createElement("img");
+      themeIcon.id = "themeIcon";
+      document.body.appendChild(themeIcon);
+
+      function toggleTheme() {
+        const isDay = currentHour >= 6 && currentHour < 18;
+        document.body.classList.toggle("light-theme", isDay);
+        document.body.classList.toggle("dark-theme", !isDay);
+        themeIcon.src = isDay ? "sun.png" : "moon.png";
+      }
+
+      toggleTheme();
+
+      const calendarTable = document.getElementById("calendar");
+      const currentMonth = currentDate.getMonth();
+      const currentYear = currentDate.getFullYear();
+
+      const monthNames = [
+        "يناير",
+        "فبراير",
+        "مارس",
+        "أبريل",
+        "مايو",
+        "يونيو",
+        "يوليو",
+        "أغسطس",
+        "سبتمبر",
+        "أكتوبر",
+        "نوفمبر",
+        "ديسمبر",
+      ];
+      document.getElementById(
+        "monthYear"
+      ).textContent = `${monthNames[currentMonth]} ${currentYear}`;
+      document.getElementById(
+        "fullDate"
+      ).textContent = `فعاليات شهر ${monthNames[currentMonth]} ${currentYear}`;
+
+      function createCalendar(month, year) {
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        let tableContent = "";
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          tableContent += `
+          <tr>
+            <td>${day}</td>
+            <td><input type="text" id="event-${day}" class="event-input" placeholder="أدخل الفعالية"></td>
+          </tr>`;
+        }
+        calendarTable.innerHTML += tableContent;
+      }
+
+      async function saveEvents() {
+        const eventsCollection = collection(
+          db,
+          `events/${currentYear}/${currentMonth}`
+        );
+        try {
+          for (let day = 1; day <= 31; day++) {
+            const eventInput = document.getElementById(`event-${day}`);
+            if (eventInput) {
+              const event = eventInput.value;
+              if (event) {
+                await setDoc(doc(eventsCollection, `day-${day}`), {
+                  event,
+                  day,
+                  month: currentMonth,
+                  year: currentYear,
+                  fullDate: `${day} ${monthNames[currentMonth]} ${currentYear}`,
+                });
+              } else {
+                await deleteDoc(doc(eventsCollection, `day-${day}`));
+              }
+            }
+          }
+          alert("تم حفظ الفعاليات بنجاح!");
+          loadEvents();
+        } catch (error) {
+          console.error("حدث خطأ أثناء الحفظ:", error);
+          alert("فشل في حفظ الفعاليات. حاول مرة أخرى.");
+        }
+      }
+
+      async function loadEvents() {
+        const eventsCollection = collection(
+          db,
+          `events/${currentYear}/${currentMonth}`
+        );
+        const eventsSnapshot = await getDocs(eventsCollection);
+
+        eventsSnapshot.forEach((doc) => {
+          const eventData = doc.data();
+          const eventInput = document.getElementById(`event-${eventData.day}`);
+          if (eventInput) {
+            eventInput.value = eventData.event;
+          }
+        });
+      }
+
+      createCalendar(currentMonth, currentYear);
+      loadEvents();
+      document.getElementById("saveBtn").addEventListener("click", saveEvents);
+    </script>
+  </body>
+</html>

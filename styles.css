@@ -1,0 +1,113 @@
+/* Importing the Rubik font from Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
+
+body {
+  font-family: "Rubik", sans-serif; /* Change "Cairo" to "Rubik" */
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Light and Dark Themes */
+body.light-theme {
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+body.dark-theme {
+  background-color: #2b2b2b;
+  color: #ddd;
+}
+
+header,
+footer {
+  background-color: #4caf50;
+  color: #fff;
+  text-align: center;
+
+  padding: 20px 0;
+  width: 100%;
+}
+
+#logo {
+  width: 100px;
+  margin-bottom: 10px;
+}
+
+main {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+th,
+td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+th {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.btn-primary {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 1em;
+  border-radius: 5px;
+}
+
+.btn-primary:hover {
+  background-color: #45a049;
+}
+
+footer {
+  margin-top: 20px;
+  padding: 10px 0;
+  font-size: 0.9em;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  header,
+  footer {
+    padding: 15px 0;
+  }
+
+  #logo {
+    width: 75px;
+  }
+
+  table {
+    font-size: 0.9em;
+  }
+
+  main {
+    padding: 15px;
+  }
+}
+
+/* Sun and Moon Icon Styles */
+#themeIcon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+#themeIcon:hover {
+  transform: rotate(20deg);
+}
